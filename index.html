@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just Me & My Laptop</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f18;
+    --bg3: #13131f;
+    --surface: #1a1a2e;
+    --border: #2a2a4a;
+    --border2: #3a3a6a;
+    --accent: #7b6faa;
+    --accent2: #9d8fd0;
+    --accent3: #c4b5e8;
+    --text: #d4cfe8;
+    --text2: #9990b8;
+    --text3: #6b6490;
+    --red: #c47a8a;
+    --green: #7aaa8a;
+    --yellow: #c4aa7a;
+    --blue: #7a9ac4;
+    --comment: #5a5475;
+    --string: #b89ac8;
+    --keyword: #a08cc0;
+    --glow: rgba(123, 111, 170, 0.15);
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(123,111,170,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(90,80,130,0.06) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  /* Rain effect */
+  .rain {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+    opacity: 0.25;
+  }
+
+  .raindrop {
+    position: absolute;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, #7b6faa);
+    animation: fall linear infinite;
+    top: -100px;
+  }
+
+  @keyframes fall {
+    to { transform: translateY(110vh); opacity: 0; }
+  }
+
+  /* Moon */
+  .moon-container {
+    position: fixed;
+    top: 40px;
+    right: 60px;
+    z-index: 0;
+    pointer-events: none;
+    animation: moonFloat 8s ease-in-out infinite;
+  }
+
+  @keyframes moonFloat {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-12px); }
+  }
+
+  .moon-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,181,232,0.12) 0%, rgba(123,111,170,0.06) 40%, transparent 70%);
+    animation: glowBreath 6s ease-in-out infinite;
+  }
+
+  @keyframes glowBreath {
+    0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.1); }
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 2rem 0 3rem;
+    animation: fadeDown 1.2s ease both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header-clock {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--accent3);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.3em;
+    margin-top: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    opacity: 0.4;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border2));
+  }
+  .divider::after { background: linear-gradient(to left, transparent, var(--border2)); }
+
+  .divider-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Code editor */
+  .editor {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    animation: fadeUp 1s ease 0.3s both;
+    box-shadow: 0 0 40px rgba(123,111,170,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .editor-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .editor-dots { display: flex; gap: 6px; }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #c47a7a; opacity: 0.7; }
+  .dot-y { background: var(--yellow); opacity: 0.7; }
+  .dot-g { background: var(--green); opacity: 0.7; }
+
+  .editor-filename { font-size: 11px; color: var(--text3); letter-spacing: 0.1em; }
+
+  .editor-body { padding: 1.5rem; counter-reset: line; }
+
+  .line { display: flex; gap: 1.5rem; min-height: 1.7em; padding: 0.05rem 0; }
+
+  .ln {
+    color: var(--text3); min-width: 1.5rem; text-align: right;
+    user-select: none; font-size: 12px; opacity: 0.5; padding-top: 0.05rem;
+  }
+
+  .code { flex: 1; }
+
+  .k  { color: var(--keyword); }
+  .s  { color: var(--string); }
+  .c  { color: var(--comment); font-style: italic; }
+  .v  { color: var(--accent2); }
+  .fn { color: var(--blue); }
+  .num{ color: var(--yellow); }
+  .op { color: var(--text2); }
+  .p  { color: var(--text3); }
+
+  .cursor {
+    display: inline-block; width: 2px; height: 1em;
+    background: var(--accent2); margin-left: 1px;
+    vertical-align: middle; animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Poem section */
+  .poem-section { animation: fadeUp 1s ease 0.5s both; }
+
+  .section-label {
+    font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 1.5rem;
+  }
+
+  .poem {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-style: italic; font-weight: 300; color: var(--text2);
+    line-height: 2; padding-left: 1.5rem; border-left: 1px solid var(--border);
+  }
+
+  .poem-line {
+    display: block; opacity: 0;
+    animation: lineReveal 0.8s ease forwards;
+  }
+
+  @keyframes lineReveal {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Terminal */
+  .terminal {
+    background: #0d0d16; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin: 2rem 0;
+    animation: fadeUp 1s ease 0.7s both;
+  }
+
+  .terminal-bar {
+    padding: 0.5rem 1rem; background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .terminal-title { font-size: 10px; color: var(--text3); letter-spacing: 0.15em; }
+
+  .terminal-body { padding: 1.25rem 1.5rem; font-size: 13px; }
+
+  .t-prompt  { color: var(--accent); }
+  .t-cmd     { color: var(--text); }
+  .t-output  { color: var(--text3); font-style: italic; padding-left: 0.5rem; }
+  .t-error   { color: var(--red); font-style: italic; }
+  .t-success { color: var(--green); }
+  .t-line    { margin: 0.25rem 0; }
+
+  /* Stats */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem; margin: 2rem 0; animation: fadeUp 1s ease 0.9s both;
+  }
+
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem; text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s; cursor: default;
+  }
+
+  .stat-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem; font-weight: 300;
+    color: var(--accent3); line-height: 1; font-style: italic;
+  }
+
+  .stat-label {
+    font-size: 10px; color: var(--text3);
+    letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.4rem;
+  }
+
+  /* Thoughts */
+  .thoughts { animation: fadeUp 1s ease 1s both; }
+
+  .thought-item {
+    display: flex; gap: 1rem; padding: 1rem 0;
+    border-bottom: 1px solid var(--border); align-items: flex-start;
+  }
+  .thought-item:last-child { border-bottom: none; }
+
+  .thought-time {
+    font-size: 10px; color: var(--text3);
+    min-width: 3rem; padding-top: 0.2rem; opacity: 0.6;
+  }
+
+  .thought-text {
+    font-style: italic; line-height: 1.6;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; color: var(--text2);
+  }
+
+  .thought-tag {
+    margin-left: auto; font-size: 9px; letter-spacing: 0.15em;
+    color: var(--text3); background: var(--bg3);
+    border: 1px solid var(--border); padding: 2px 8px;
+    border-radius: 20px; white-space: nowrap; align-self: flex-start; opacity: 0.6;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 3rem 0 1rem;
+    animation: fadeUp 1s ease 1.2s both;
+  }
+
+  .footer-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-style: italic; font-weight: 300;
+    color: var(--text3); line-height: 1.8;
+    max-width: 500px; margin: 0 auto 1.5rem;
+  }
+
+  .footer-sig {
+    font-size: 10px; color: var(--text3);
+    letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5;
+  }
+
+  .glow-text { animation: glowPulse 4s ease-in-out infinite; }
+
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: none; }
+    50%       { text-shadow: 0 0 30px rgba(196,181,232,0.3); }
+  }
+</style>
+</head>
+<body>
+
+<div class="rain" id="rain"></div>
+
+<!-- MOON -->
+<div class="moon-container">
+  <div class="moon-glow"></div>
+  <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="moonGrad" cx="38%" cy="35%" r="60%">
+        <stop offset="0%"   stop-color="#f0eaff"/>
+        <stop offset="40%"  stop-color="#d4c8f0"/>
+        <stop offset="100%" stop-color="#8878b8"/>
+      </radialGradient>
+      <radialGradient id="craterGrad" cx="40%" cy="35%" r="60%">
+        <stop offset="0%"   stop-color="#9080b0" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#6a5a90" stop-opacity="0.15"/>
+      </radialGradient>
+      <filter id="moonBlur">
+        <feGaussianBlur stdDeviation="0.6"/>
+      </filter>
+    </defs>
+
+    <!-- outer soft halo -->
+    <circle cx="45" cy="45" r="44" fill="rgba(180,160,230,0.04)"/>
+    <circle cx="45" cy="45" r="40" fill="rgba(180,160,230,0.06)"/>
+
+    <!-- moon body -->
+    <circle cx="45" cy="45" r="34" fill="url(#moonGrad)"/>
+
+    <!-- subtle dark edge shading -->
+    <circle cx="45" cy="45" r="34" fill="none"
+      stroke="#6a5a90" stroke-width="1" opacity="0.3"/>
+
+    <!-- craters -->
+    <circle cx="33" cy="38" r="5.5" fill="url(#craterGrad)" filter="url(#moonBlur)"/>
+    <circle cx="33" cy="38" r="5.5" fill="none" stroke="#8070a8" stroke-width="0.6" opacity="0.4"/>
+
+    <circle cx="55" cy="52" r="7" fill="url(#craterGrad)" filter="url(#moonBlur)"/>
+    <circle cx="55" cy="52" r="7" fill="none" stroke="#8070a8" stroke-width="0.6" opacity="0.4"/>
+
+    <circle cx="40" cy="57" r="3.5" fill="url(#craterGrad)" filter="url(#moonBlur)"/>
+    <circle cx="40" cy="57" r="3.5" fill="none" stroke="#8070a8" stroke-width="0.5" opacity="0.3"/>
+
+    <circle cx="58" cy="34" r="4" fill="url(#craterGrad)" filter="url(#moonBlur)"/>
+    <circle cx="58" cy="34" r="4" fill="none" stroke="#8070a8" stroke-width="0.5" opacity="0.3"/>
+
+    <circle cx="28" cy="52" r="2.5" fill="url(#craterGrad)" filter="url(#moonBlur)"/>
+
+    <!-- subtle surface texture lines -->
+    <ellipse cx="44" cy="46" rx="20" ry="6" fill="none"
+      stroke="#a090c8" stroke-width="0.5" opacity="0.18" transform="rotate(-20 44 46)"/>
+    <ellipse cx="50" cy="40" rx="12" ry="4" fill="none"
+      stroke="#a090c8" stroke-width="0.4" opacity="0.12" transform="rotate(15 50 40)"/>
+
+    <!-- tiny stars around moon -->
+    <circle cx="5"  cy="12" r="1"   fill="#c4b5e8" opacity="0.6"/>
+    <circle cx="82" cy="20" r="0.8" fill="#c4b5e8" opacity="0.5"/>
+    <circle cx="12" cy="75" r="0.7" fill="#c4b5e8" opacity="0.4"/>
+    <circle cx="78" cy="68" r="1.1" fill="#c4b5e8" opacity="0.5"/>
+    <circle cx="88" cy="45" r="0.6" fill="#c4b5e8" opacity="0.35"/>
+    <circle cx="2"  cy="48" r="0.9" fill="#c4b5e8" opacity="0.4"/>
+  </svg>
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-clock" id="clock">// 03:47 AM</div>
+    <h1 class="header-title glow-text">In this world, nothing is permanent—everyone is temporary. In the end it's just me &amp; my laptop</h1>
+    <p class="header-sub">when everyone leaves, the code stays</p>
+  </header>
+
+  <div class="divider"><span class="divider-dot"></span></div>
+
+  <!-- CODE EDITOR -->
+  <div class="editor">
+    <div class="editor-bar">
+      <div class="editor-dots">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <span class="editor-filename">feelings.js</span>
+      <span style="font-size:10px;color:var(--text3);opacity:0.5;">UTF-8</span>
+    </div>
+    <div class="editor-body">
+      <div class="line"><span class="ln">1</span><span class="code"><span class="c">// everyone leaves. the code never does.</span></span></div>
+      <div class="line"><span class="ln">2</span><span class="code"></span></div>
+      <div class="line"><span class="ln">3</span><span class="code"><span class="k">const</span> <span class="v">me</span> <span class="op">=</span> <span class="p">{</span></span></div>
+      <div class="line"><span class="ln">4</span><span class="code">&nbsp;&nbsp;<span class="v">state</span><span class="op">:</span> <span class="s">"awake at 3am again"</span><span class="p">,</span></span></div>
+      <div class="line"><span class="ln">5</span><span class="code">&nbsp;&nbsp;<span class="v">companions</span><span class="op">:</span> <span class="p">[</span><span class="s">"cold coffee"</span><span class="p">,</span> <span class="s">"this screen"</span><span class="p">,</span> <span class="s">"dark silence"</span><span class="p">],</span></span></div>
+      <div class="line"><span class="ln">6</span><span class="code">&nbsp;&nbsp;<span class="v">linesWritten</span><span class="op">:</span> <span class="num">∞</span><span class="p">,</span></span></div>
+      <div class="line"><span class="ln">7</span><span class="code">&nbsp;&nbsp;<span class="v">linesDeleted</span><span class="op">:</span> <span class="num">∞ + 1</span><span class="p">,</span></span></div>
+      <div class="line"><span class="ln">8</span><span class="code"><span class="p">};</span></span></div>
+      <div class="line"><span class="ln">9</span><span class="code"></span></div>
+      <div class="line"><span class="ln">10</span><span class="code"><span class="k">function</span> <span class="fn">findPeace</span><span class="p">(</span><span class="v">heart</span><span class="p">) {</span></span></div>
+      <div class="line"><span class="ln">11</span><span class="code">&nbsp;&nbsp;<span class="k">if</span> <span class="p">(</span><span class="v">heart</span><span class="p">.</span><span class="fn">isEmpty</span><span class="p">())</span> <span class="k">return</span> <span class="fn">openEditor</span><span class="p">();</span></span></div>
+      <div class="line"><span class="ln">12</span><span class="code">&nbsp;&nbsp;<span class="k">return</span> <span class="v">heart</span><span class="p">.</span><span class="fn">write</span><span class="p">(</span><span class="s">"something beautiful instead"</span><span class="p">);</span></span></div>
+      <div class="line"><span class="ln">13</span><span class="code"><span class="p">}</span></span></div>
+      <div class="line"><span class="ln">14</span><span class="code"></span></div>
+      <div class="line"><span class="ln">15</span><span class="code"><span class="c">// NOTE: people are temporary. commits are forever.</span></span></div>
+      <div class="line"><span class="ln">16</span><span class="code"><span class="k">export default</span> <span class="v">me</span><span class="p">;</span><span class="cursor"></span></span></div>
+    </div>
+  </div>
+
+  <!-- POEM -->
+  <div class="poem-section">
+    <p class="section-label">// verses written between commits</p>
+    <div class="poem">
+      <span class="poem-line">you can stay or you can leave,</span>
+      <span class="poem-line">either way, my screen still glows,</span>
+      <span class="poem-line">and I no longer wait for you.</span>
+    </div>
+  </div>
+
+  <div class="divider" style="margin:2.5rem 0"><span class="divider-dot"></span></div>
+
+  <!-- TERMINAL -->
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="editor-dots">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <span class="terminal-title">bash — 3:47 AM</span>
+    </div>
+    <div class="terminal-body">
+      <div class="t-line"><span class="t-prompt">~</span> <span class="t-cmd">git log --oneline --author="me" --since="forever"</span></div>
+      <div class="t-line"><span class="t-output">a3f91b2 — "add: reason to keep going"</span></div>
+      <div class="t-line"><span class="t-output">7c2e4d1 — "fix: broken heart (again)"</span></div>
+      <div class="t-line"><span class="t-output">f88ba30 — "refactor: learned to need less"</span></div>
+      <div class="t-line"><span class="t-output">12ab4ef — "remove: everyone who wasn't real"</span></div>
+      <div class="t-line" style="margin-top:0.75rem"><span class="t-prompt">~</span> <span class="t-cmd">npm run feelings</span></div>
+      <div class="t-line"><span class="t-error">  error: no recipients found for output</span></div>
+      <div class="t-line" style="margin-top:0.75rem"><span class="t-prompt">~</span> <span class="t-cmd">./build_something_beautiful.sh</span></div>
+      <div class="t-line"><span class="t-success">  ✓ compiling loneliness into light...</span></div>
+      <div class="t-line"><span class="t-success">  ✓ done. it's enough that it exists.</span></div>
+      <div class="t-line" style="margin-top:0.4rem"><span class="t-prompt">~</span> <span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-clock">03:47</div>
+      <div class="stat-label">current time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">lines of code</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">01</div>
+      <div class="stat-label">constant companion</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">0°C</div>
+      <div class="stat-label">coffee temperature</div>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-dot"></span></div>
+
+  <!-- THOUGHTS -->
+  <div class="thoughts">
+    <p class="section-label">// console.log(thoughts)</p>
+    <div class="thought-item">
+      <span class="thought-time">01:12</span>
+      <span class="thought-text">"the only things that stayed were the things i built."</span>
+      <span class="thought-tag">#truth</span>
+    </div>
+    <div class="thought-item">
+      <span class="thought-time">02:38</span>
+      <span class="thought-text">"maybe loneliness is just solitude with better wifi."</span>
+      <span class="thought-tag">#cope</span>
+    </div>
+    <div class="thought-item">
+      <span class="thought-time">03:01</span>
+      <span class="thought-text">"i wrote you into a comment. now you live in my codebase."</span>
+      <span class="thought-tag">#romantic</span>
+    </div>
+    <div class="thought-item">
+      <span class="thought-time">03:47</span>
+      <span class="thought-text">"nothing is permanent. but this build will outlast most things."</span>
+      <span class="thought-tag">#now</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="divider" style="margin-bottom:2rem"><span class="divider-dot"></span></div>
+    <p class="footer-quote">
+      "in the end, i learned to be whole<br>
+      between the semicolons—<br>
+      the screen never asks if i'm okay,<br>
+      but it always stays."
+    </p>
+    <p class="footer-sig">— just me &amp; my laptop · always online</p>
+  </footer>
+
+</div>
+
+<script>
+  // Rain
+  const rain = document.getElementById('rain');
+  for (let i = 0; i < 60; i++) {
+    const d = document.createElement('div');
+    d.className = 'raindrop';
+    const h = Math.random() * 80 + 20;
+    d.style.cssText = `
+      left: ${Math.random() * 100}%;
+      height: ${h}px;
+      animation-duration: ${Math.random() * 2 + 1.5}s;
+      animation-delay: ${Math.random() * 3}s;
+      opacity: ${Math.random() * 0.4 + 0.1};
+    `;
+    rain.appendChild(d);
+  }
+
+  // Live clock
+  function tick() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = `${h}:${m}`;
+    document.getElementById('clock').textContent = `// ${timeStr}`;
+    const statClock = document.getElementById('stat-clock');
+    if (statClock) statClock.textContent = timeStr;
+  }
+  tick();
+  setInterval(tick, 60000);
+</script>
+
+</body>
+</html>
